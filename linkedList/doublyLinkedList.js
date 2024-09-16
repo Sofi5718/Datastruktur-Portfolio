@@ -61,23 +61,59 @@ class DoublyLinkedList {
         this.count--;
     }
 
-    removeNode(data) {
+    remove(data) {
         let current = this.head;
-        if (current.data == data) {
-            this.head = current.next;
-            this.head.prev = null;
-            this.count--;
-            return;
-        }
         while (current) {
             if (current.data == data) {
-                current.prev.next = current.next;
-                current.next.prev = current.prev;
-                this.count--;
-                return;
+                this.removeNode(current);
+                return true;
             }
             current = current.next;
         }
+        return false;
+    }
+
+    removeIndex(index) {
+        let current = this.nodeAt(index);
+        if (!current) return null;
+        this.removeNode(current);
+        return current.data;
+    }
+
+    get(index) {
+        let current = this.nodeAt(index);
+        return current ? current.data : null;
+    }
+
+    indexOf(data) {
+        let current = this.head;
+        let index = 0;
+        while (current) {
+            if (current.data == data) return index;
+            current = current.next;
+            index++;
+        }
+        return -1;
+    }
+
+    insertAfter(index, data) {
+        let current = this.nodeAt(index);
+        if (!current) return;
+        const newNode = new Node(data);
+        newNode.next = current;
+        newNode.prev = current.prev;
+        if (current.prev) current.prev.next = newNode;
+        current.prev = newNode;
+        if (current === this.head) this.head = newNode;
+        this.count++;
+    }
+
+    first() {
+        return this.head ? this.head.data : null;
+    }
+
+    last() {
+        return this.tail ? this.tail.data : null;
     }
 
     dumpList() {
@@ -98,6 +134,53 @@ class DoublyLinkedList {
     }
     size() {
         return this.count;
+    }
+
+    insertAfterNode(newNode, existingNode) {
+        newNode.next = existingNode.next;
+        newNode.prev = existingNode;
+        if (existingNode.next) existingNode.next.prev = newNode;
+        existingNode.next = newNode;
+        if (existingNode === this.tail) this.tail = newNode;
+        this.count++;
+    }
+
+    insertBeforeNode(newNode, existingNode) {
+        newNode.next = existingNode;
+        newNode.prev = existingNode.prev;
+        if (existingNode.prev) existingNode.prev.next = newNode;
+        existingNode.prev = newNode;
+        if (existingNode === this.head) this.head = newNode;
+        this.count++;
+    }
+
+    removeNode(existingNode) {
+        if (existingNode.prev) existingNode.prev.next = existingNode.next;
+        if (existingNode.next) existingNode.next.prev = existingNode.prev;
+        if (existingNode === this.head) this.head = existingNode.next;
+        if (existingNode === this.tail) this.tail = existingNode.prev;
+        this.count--;
+    }
+
+    nodeAt(index) {
+        if (index < 0 || index >= this.count) return null;
+        let current = this.head;
+        for (let i = 0; i < index; i++) {
+            current = current.next;
+        }
+        return current;
+    }
+
+    swapNodes(nodeA, nodeB) {
+        if (nodeA === nodeB) return;
+        let temp = nodeA.data;
+        nodeA.data = nodeB.data;
+        nodeB.data = temp;
+    }
+
+    clear() {
+        this.head = this.tail = null;
+        this.count = 0;
     }
 }
 
