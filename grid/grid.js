@@ -1,79 +1,99 @@
 export default class Grid {
     constructor(rows, cols) {
+        const { row: rows, col: columns } = this.parseRowCol(rows, cols);
         this.rows = rows;
-        this.cols = cols;
-        this.grid = Array.from({ length: rows }, () => Array.from({ length: cols }, () => 0));
+        this.cols = columns;
+        this.grid = Array.from({ length: rows }, () => Array.from({ length: columns }, () => 0));
     }
 
-    set(row, col, value) {
-        this.grid[row][col] = value;
+    parseRowCol(rowOrObj, col) {
+        if (typeof rowOrObj === "object") {
+            return rowOrObj;
+        }
+        return { row: rowOrObj, col };
     }
 
-    get(row, col) {
-        return this.grid[row][col];
+    set(rowOrObj, colOrValue, value) {
+        const { row, col } = this.parseRowCol(rowOrObj, colOrValue);
+        const checkVal = value !== undefined ? value : colOrValue;
+        this.grid[row][col] = checkVal;
     }
 
-    indexFor(row, col) {
-        return row * this.cols + col;
+    get(rowOrObj, col) {
+        const { row, col: column } = this.parseRowCol(rowOrObj, col);
+        return this.grid[row][column];
+    }
+
+    indexFor(rowOrObj, col) {
+        const { row, col: column } = this.parseRowCol(rowOrObj, col);
+        return row * this.cols + column;
     }
     rowColFor(index) {
         const row = Math.floor(index / this.cols);
         const col = index % this.cols;
         return { row, col };
     }
-    neighbours(row, col) {
+    neighbours(rowOrObj, col) {
+        const { row, col: column } = this.parseRowCol(rowOrObj, col);
         const neighbours = [];
         if (row > 0) {
-            neighbours.push({ row: row - 1, col }); //kig op
+            neighbours.push({ row: row - 1, column }); //kig op
         }
         if (row < this.rows - 1) {
-            neighbours.push({ row: row + 1, col }); // kig ned
+            neighbours.push({ row: row + 1, column }); // kig ned
         }
-        if (col > 0) {
-            neighbours.push({ row, col: col - 1 }); // kig venstre
+        if (column > 0) {
+            neighbours.push({ row, col: column - 1 }); // kig venstre
         }
-        if (col < this.cols - 1) {
-            neighbours.push({ row, col: col + 1 }); // kig højre
+        if (column < this.cols - 1) {
+            neighbours.push({ row, col: column + 1 }); // kig højre
         }
         return neighbours;
     }
-    neighboursValues(row, col) {
-        return this.neighbours(row, col).map(({ row, col }) => this.get(row, col));
+    neighboursValues(rowOrObj, col) {
+        const { row, col: column } = this.parseRowCol(rowOrObj, col);
+        return this.neighbours(row, column).map(({ row, col }) => this.get(row, col));
     }
-    nextInRow(row, col) {
-        if (col < this.cols - 1) {
-            return { row, col: col + 1 };
+    nextInRow(rowOrObj, col) {
+        const { row, col: column } = this.parseRowCol(rowOrObj, col);
+        if (column < this.cols - 1) {
+            return { row, col: column + 1 };
         }
         return undefined;
     }
 
-    nextInCol(row, col) {
+    nextInCol(rowOrObj, col) {
+        const { row, col: column } = this.parseRowCol(rowOrObj, col);
         if (row < this.rows - 1) {
-            return { row: row + 1, col };
+            return { row: row + 1, column };
         }
         return undefined;
     }
-    north(row, col) {
+    north(rowOrObj, col) {
+        const { row, col } = this.parseRowCol(rowOrObj, col);
         if (row > 0) {
-            return { row: row - 1, col };
+            return { row: row - 1, column };
         }
         return undefined;
     }
-    south(row, col) {
+    south(rowOrObj, col) {
+        const { row, col } = this.parseRowCol(rowOrObj, col);
         if (row < this.rows - 1) {
-            return { row: row + 1, col };
+            return { row: row + 1, column };
         }
         return undefined;
     }
-    west(row, col) {
+    west(rowOrObj, col) {
+        const { row, col: column } = this.parseRowCol(rowOrObj, col);
         if (col > 0) {
-            return { row, col: col - 1 };
+            return { row, col: column - 1 };
         }
         return undefined;
     }
-    east(row, col) {
+    east(rowOrObj, col) {
+        const { row, col: column } = this.parseRowCol(rowOrObj, col);
         if (col < this.cols - 1) {
-            return { row, col: col + 1 };
+            return { row, col: column + 1 };
         }
         return undefined;
     }
